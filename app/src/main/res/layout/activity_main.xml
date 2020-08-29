@@ -72,10 +72,13 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_previous"
+        android:enabled="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
         android:layout_margin="@dimen/fab_margin"
+        app:tint="@android:color/white"
+        app:backgroundTint="@drawable/fab"
         app:srcCompat="@drawable/ic_previous" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -84,5 +87,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+        app:tint="@android:color/white"
+        app:backgroundTint="@drawable/fab"
         app:srcCompat="@drawable/ic_next" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

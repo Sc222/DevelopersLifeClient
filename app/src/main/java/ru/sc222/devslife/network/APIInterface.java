@@ -1,4 +1,4 @@
-package ru.sc222.devslife.core;
+package ru.sc222.devslife.network;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

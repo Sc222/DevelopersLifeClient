@@ -11,7 +11,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import ru.sc222.devslife.R;
-import ru.sc222.devslife.core.ControllableFragment;
+import ru.sc222.devslife.ui.ControllableFragment;
 
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {

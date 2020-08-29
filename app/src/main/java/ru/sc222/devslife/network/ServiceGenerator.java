@@ -1,4 +1,4 @@
-package ru.sc222.devslife.core;
+package ru.sc222.devslife.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

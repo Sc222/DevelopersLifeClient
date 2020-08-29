@@ -27,8 +27,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-        FloatingActionButton fab = findViewById(R.id.fab_next);
-        fab.setOnClickListener(this);
+        FloatingActionButton fabNext = findViewById(R.id.fab_next);
+        fabNext.setOnClickListener(this);
+
+        FloatingActionButton fabPrevious = findViewById(R.id.fab_previous);
+        fabPrevious.setOnClickListener(this);
     }
 
 

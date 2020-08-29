@@ -1,7 +1,9 @@
-package ru.sc222.devslife.core;
+package ru.sc222.devslife.network;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import ru.sc222.devslife.core.SimpleEntry;
 
 public class Entry {
 
@@ -58,6 +60,11 @@ public class Entry {
     @SerializedName("canVote")
     @Expose
     private Boolean canVote;
+
+    public SimpleEntry buildSimpleEntry()
+    {
+        return new SimpleEntry(id, description, votes, author, gifURL);
+    }
 
     public Integer getId() {
         return id;
