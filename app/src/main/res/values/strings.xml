@@ -2,4 +2,6 @@
     <string name="app_name">Devs Life</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
+    <string name="collapsing_toolbar_subtitle">Смешные гиф-анимации о жизни разработчиков</string>
+    <string name="collapsing_toolbar_title">Developers Life</string>
 </resources>
