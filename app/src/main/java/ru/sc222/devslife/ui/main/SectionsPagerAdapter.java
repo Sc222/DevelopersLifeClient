@@ -1,7 +1,9 @@
 package ru.sc222.devslife.ui.main;
 
 import android.content.Context;
+import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
@@ -9,27 +11,45 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import ru.sc222.devslife.R;
+import ru.sc222.devslife.core.ControllableFragment;
 
-/**
- * A [FragmentPagerAdapter] that returns a fragment corresponding to
- * one of the sections/tabs/pages.
- */
+
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
+    private static final int[] TAB_TITLES = new int[]{R.string.tab_random,R.string.tab_latest, R.string.tab_best, R.string.tab_hot};
     private final Context mContext;
+    private ControllableFragment mCurrentFragment;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
-        super(fm);
+        super(fm, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         mContext = context;
     }
 
+    public ControllableFragment getCurrentFragment() {
+        return mCurrentFragment;
+    }
+
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+        if (getCurrentFragment() != object) {
+            mCurrentFragment = ((ControllableFragment) object);
+        }
+        super.setPrimaryItem(container, position, object);
+    }
+
+
+    @NonNull
     @Override
     public Fragment getItem(int position) {
-        // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
-        return PlaceholderFragment.newInstance(position + 1);
+       switch (position)
+       {
+           //all fragments must be children of ControllableFragment
+           case 0:
+               return new RandomFragment();
+           default:
+               return PlaceholderFragment.newInstance(position + 1);
+       }
     }
 
     @Nullable
@@ -40,7 +60,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        // Show 2 total pages.
-        return 2;
+        return 4;
     }
 }

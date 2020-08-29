@@ -13,11 +13,12 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import ru.sc222.devslife.R;
+import ru.sc222.devslife.core.ControllableFragment;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlaceholderFragment extends Fragment {
+public class PlaceholderFragment extends ControllableFragment {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
 
@@ -55,5 +56,15 @@ public class PlaceholderFragment extends Fragment {
             }
         });
         return root;
+    }
+
+    @Override
+    public void fabNextClicked() {
+
+    }
+
+    @Override
+    public void fabPreviousClicked() {
+
     }
 }
