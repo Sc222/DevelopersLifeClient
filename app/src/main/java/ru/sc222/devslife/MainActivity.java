@@ -2,7 +2,6 @@ package ru.sc222.devslife;
 
 import android.os.Bundle;
 
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 

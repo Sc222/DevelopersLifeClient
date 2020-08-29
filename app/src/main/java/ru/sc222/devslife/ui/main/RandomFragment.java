@@ -52,7 +52,7 @@ public class RandomFragment extends ControllableFragment {
 
     private Callback<Entry> entryCallback = new Callback<Entry>() {
         @Override
-        public void onResponse(Call<Entry> call, Response<Entry> response) {
+        public void onResponse(@NonNull Call<Entry> call, Response<Entry> response) {
 
             if (response.isSuccessful()) {
                 Entry entry = response.body();
@@ -75,7 +75,7 @@ public class RandomFragment extends ControllableFragment {
         }
 
         @Override
-        public void onFailure(Call<Entry> call, Throwable t) {
+        public void onFailure(@NonNull Call<Entry> call, @NonNull Throwable t) {
             //todo SHOW ERROR
         }
     };

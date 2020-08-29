@@ -17,7 +17,7 @@ import ru.sc222.devslife.ui.ControllableFragment;
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_random,R.string.tab_latest, R.string.tab_best, R.string.tab_hot};
+    private static final int[] TAB_TITLES = new int[]{R.string.tab_random, R.string.tab_latest, R.string.tab_best, R.string.tab_hot};
     private final Context mContext;
     private ControllableFragment mCurrentFragment;
 
@@ -31,7 +31,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+    public void setPrimaryItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         if (getCurrentFragment() != object) {
             mCurrentFragment = ((ControllableFragment) object);
         }
@@ -42,14 +42,13 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @NonNull
     @Override
     public Fragment getItem(int position) {
-       switch (position)
-       {
-           //all fragments must be children of ControllableFragment
-           case 0:
-               return new RandomFragment();
-           default:
-               return PlaceholderFragment.newInstance(position + 1);
-       }
+        switch (position) {
+            //all fragments must be children of ControllableFragment
+            case 0:
+                return new RandomFragment();
+            default:
+                return PlaceholderFragment.newInstance(position + 1);
+        }
     }
 
     @Nullable

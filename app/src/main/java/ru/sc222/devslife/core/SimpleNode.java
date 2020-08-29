@@ -1,10 +1,9 @@
 package ru.sc222.devslife.core;
 
-public class SimpleNode<T>{
-    T item;
-    SimpleNode<T> previous;
-
-    SimpleNode<T> next;
+public class SimpleNode<T> {
+    private T item;
+    private SimpleNode<T> previous;
+    private SimpleNode<T> next;
 
     public SimpleNode(T item) {
         this.item = item;
@@ -18,7 +17,15 @@ public class SimpleNode<T>{
         return previous;
     }
 
+    public void setPrevious(SimpleNode<T> previous) {
+        this.previous = previous;
+    }
+
     public SimpleNode<T> getNext() {
         return next;
+    }
+
+    public void setNext(SimpleNode<T> next) {
+        this.next = next;
     }
 }
