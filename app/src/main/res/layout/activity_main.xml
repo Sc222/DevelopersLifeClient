@@ -53,10 +53,12 @@
                 app:titleTextColor="@color/colorPrimary" />
 
             <com.google.android.material.tabs.TabLayout
+                app:tabTextAppearance="@style/TextAppearance.AppCompat.Small"
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
+
                 android:background="@android:color/transparent"
                 app:tabSelectedTextColor="@color/colorPrimary" />
 

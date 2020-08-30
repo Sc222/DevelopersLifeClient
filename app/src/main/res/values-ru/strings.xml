@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="tab_random">Рандомн</string>
+    <string name="tab_random">Рандом</string>
     <string name="tab_latest">Последнее</string>
     <string name="tab_top">Лучшее</string>
     <string name="tab_hot">Горячее</string>
