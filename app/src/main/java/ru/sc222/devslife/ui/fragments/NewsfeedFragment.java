@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -70,6 +71,7 @@ public class NewsfeedFragment extends ControllableFragment {
         AppCompatImageView errorIcon = root.findViewById(R.id.error_icon);
         AppCompatTextView errorTitle = root.findViewById(R.id.error_title);
         Button errorButton = root.findViewById(R.id.error_button);
+        ProgressBar errorProgressBar = root.findViewById(R.id.error_progressbar);
         FloatingActionButton fabPrevious = Objects.requireNonNull(getActivity()).findViewById(R.id.fab_previous);
         FloatingActionButton fabNext = getActivity().findViewById(R.id.fab_next);
 
@@ -89,6 +91,7 @@ public class NewsfeedFragment extends ControllableFragment {
         newsfeedFragmentViewModel.getError().observe(getViewLifecycleOwner(), error -> {
             newsfeedFragmentViewModel.updateCanLoadPrevious();
             newsfeedFragmentViewModel.updateCanLoadNext();
+            errorProgressBar.setVisibility(View.INVISIBLE);
             if (error != PageLoadError.NO_ERRORS) {
                 recyclerView.setVisibility(View.GONE);
                 errorLayout.setVisibility(View.VISIBLE);
@@ -105,11 +108,14 @@ public class NewsfeedFragment extends ControllableFragment {
                 }
 
                 errorButton.setOnClickListener(view -> {
-                    switch (error) {
-                        case NO_POSTS:
-                        case CANT_LOAD_PAGE:
-                            newsfeedFragmentViewModel.loadEntries(0);
-                            break;
+                    if (errorProgressBar.getVisibility() == View.INVISIBLE) {
+                        errorProgressBar.setVisibility(View.VISIBLE);
+                        switch (error) {
+                            case NO_POSTS:
+                            case CANT_LOAD_PAGE:
+                                newsfeedFragmentViewModel.loadEntries(0);
+                                break;
+                        }
                     }
                 });
             } else {

@@ -20,12 +20,12 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:orientation="vertical"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.25">
+        app:layout_constraintVertical_bias="0.10">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/error_icon"
@@ -37,12 +37,23 @@
             app:srcCompat="@drawable/ic_sorry"
             app:tint="@color/colorPrimary" />
 
+        <ProgressBar
+            android:id="@+id/error_progressbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="96dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:layout_margin="2dp"
+            android:indeterminate="true"
+            android:visibility="invisible" />
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/error_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="8dp"
             android:gravity="center"
             android:text="@string/no_posts"
             android:textAppearance="@style/TextAppearance.AppCompat.Small" />
@@ -50,11 +61,12 @@
         <Button
             android:id="@+id/error_button"
             style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
+            android:layout_width="72dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="2dp"
             android:text="@string/button_retry" />
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.recyclerview.widget.RecyclerView

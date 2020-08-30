@@ -109,11 +109,15 @@ public class RandomFragment extends ControllableFragment {
         AppCompatImageView errorIcon = root.findViewById(R.id.error_icon);
         AppCompatTextView errorTitle = root.findViewById(R.id.error_title);
         Button errorButton = root.findViewById(R.id.error_button);
-        setupObservers(loadProgress, fabPrevious, fabNext, errorLayout, errorIcon, errorTitle, errorButton);
+        ProgressBar errorProgressBar = root.findViewById(R.id.error_progressbar);
+        setupObservers(loadProgress, fabPrevious, fabNext, errorLayout, errorIcon, errorTitle, errorButton, errorProgressBar);
         return root;
     }
 
-    private void setupObservers(ProgressBar loadProgress, FloatingActionButton fabPrevious, FloatingActionButton fabNext, LinearLayoutCompat errorLayout, AppCompatImageView errorIcon, AppCompatTextView errorTitle, Button errorButton) {
+    private void setupObservers(ProgressBar loadProgress, FloatingActionButton fabPrevious,
+                                FloatingActionButton fabNext, LinearLayoutCompat errorLayout,
+                                AppCompatImageView errorIcon, AppCompatTextView errorTitle,
+                                Button errorButton, ProgressBar errorProgressBar) {
         randomFragmentViewModel.getCurrentEntry().observe(getViewLifecycleOwner(), entry -> {
             if (entry != null) {
                 Log.e("update curr", "update");
@@ -151,6 +155,7 @@ public class RandomFragment extends ControllableFragment {
 
         randomFragmentViewModel.getError().observe(getViewLifecycleOwner(), errorInfo -> {
             randomFragmentViewModel.updateCanLoadPrevious();
+            errorProgressBar.setVisibility(View.INVISIBLE);
             if (errorInfo.hasErrors()) {
                 imageViewEntry.setImageResource(R.drawable.gray);
                 toolbarEntry.setVisibility(View.GONE);
@@ -173,14 +178,17 @@ public class RandomFragment extends ControllableFragment {
                 }
 
                 errorButton.setOnClickListener(view -> {
-                    switch (errorInfo.getError()) {
-                        case CANT_LOAD_POST:
-                        case COUB_NOT_SUPPORTED:
-                            loadEntry();
-                            break;
-                        case CANT_LOAD_IMAGE:
-                            loadEntryImage(errorInfo.getRetryUrl());
-                            break;
+                    if (errorProgressBar.getVisibility() == View.INVISIBLE) {
+                        errorProgressBar.setVisibility(View.VISIBLE);
+                        switch (errorInfo.getError()) {
+                            case CANT_LOAD_POST:
+                            case COUB_NOT_SUPPORTED:
+                                loadEntry();
+                                break;
+                            case CANT_LOAD_IMAGE:
+                                loadEntryImage(errorInfo.getRetryUrl());
+                                break;
+                        }
                     }
                 });
             } else {
