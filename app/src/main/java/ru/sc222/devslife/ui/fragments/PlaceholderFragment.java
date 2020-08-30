@@ -1,4 +1,4 @@
-package ru.sc222.devslife.ui.main;
+package ru.sc222.devslife.ui.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import ru.sc222.devslife.R;
 import ru.sc222.devslife.ui.custom.ControllableFragment;
+import ru.sc222.devslife.viewmodel.PageViewModel;
 
 /**
  * A placeholder fragment containing a simple view.

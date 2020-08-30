@@ -1,4 +1,4 @@
-package ru.sc222.devslife.ui.main;
+package ru.sc222.devslife.ui.fragments;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -39,6 +39,9 @@ import ru.sc222.devslife.network.APIInterface;
 import ru.sc222.devslife.network.model.Entry;
 import ru.sc222.devslife.network.ServiceGenerator;
 import ru.sc222.devslife.ui.custom.ControllableFragment;
+import ru.sc222.devslife.utils.ErrorInfo;
+import ru.sc222.devslife.utils.LoadError;
+import ru.sc222.devslife.viewmodel.RandomFragmentViewModel;
 
 public class RandomFragment extends ControllableFragment {
 
@@ -58,7 +61,7 @@ public class RandomFragment extends ControllableFragment {
             if (response.isSuccessful()) {
                 Entry entry = response.body();
                 assert entry != null;
-                randomFragmentViewModel.fixError(ErrorInfo.Error.CANT_LOAD_POST);
+                randomFragmentViewModel.fixError(LoadError.CANT_LOAD_POST);
 
                 Log.e("Loaded", "entry author: " + entry.getDescription());
                 Log.e("Loaded", "entry desc: " + entry.getDescription());
@@ -66,17 +69,17 @@ public class RandomFragment extends ControllableFragment {
                 Log.e("Loaded", "entry preview: " + entry.getPreviewURL());
 
                 if (entry.getType().equals(Entry.TYPE_COUB)) {
-                    randomFragmentViewModel.setError(new ErrorInfo(ErrorInfo.Error.COUB_NOT_SUPPORTED));
+                    randomFragmentViewModel.setError(new ErrorInfo(LoadError.COUB_NOT_SUPPORTED));
                     Log.e("ERROR", "post onResponse: " + "UNSUPPORTED COUB POST");
                 } else {
-                    randomFragmentViewModel.fixError(ErrorInfo.Error.COUB_NOT_SUPPORTED);
+                    randomFragmentViewModel.fixError(LoadError.COUB_NOT_SUPPORTED);
                     randomFragmentViewModel.addEntry(entry.buildSimpleEntry());
                     loadEntryImage(entry.buildSimpleEntry().getGifURL());
                 }
             } else {
                 try {
                     assert response.errorBody() != null;
-                    randomFragmentViewModel.setError(new ErrorInfo(ErrorInfo.Error.CANT_LOAD_POST));
+                    randomFragmentViewModel.setError(new ErrorInfo(LoadError.CANT_LOAD_POST));
                     Log.e("ERROR", "post onResponse: " + response.errorBody().string());
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -86,7 +89,7 @@ public class RandomFragment extends ControllableFragment {
 
         @Override
         public void onFailure(@NonNull Call<Entry> call, @NonNull Throwable t) {
-            randomFragmentViewModel.setError(new ErrorInfo(ErrorInfo.Error.CANT_LOAD_POST));
+            randomFragmentViewModel.setError(new ErrorInfo(LoadError.CANT_LOAD_POST));
             Log.e("ERROR", "post onFailure: " + t.toString());
         }
     };
@@ -205,7 +208,7 @@ public class RandomFragment extends ControllableFragment {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
                         if (model instanceof String)
-                            randomFragmentViewModel.setError(new ErrorInfo(ErrorInfo.Error.CANT_LOAD_IMAGE, (String) model));
+                            randomFragmentViewModel.setError(new ErrorInfo(LoadError.CANT_LOAD_IMAGE, (String) model));
 
                         assert e != null;
                         Log.e("ERROR", "image onLoadFailed: "+e.getMessage());
@@ -214,7 +217,7 @@ public class RandomFragment extends ControllableFragment {
 
                     @Override
                     public boolean onResourceReady(GifDrawable resource, Object model, Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
-                        randomFragmentViewModel.fixError(ErrorInfo.Error.CANT_LOAD_IMAGE);
+                        randomFragmentViewModel.fixError(LoadError.CANT_LOAD_IMAGE);
 
                         randomFragmentViewModel.setIsCurrentEntryImageLoaded(true);
                         randomFragmentViewModel.setCanLoadNext(true);
@@ -272,8 +275,8 @@ public class RandomFragment extends ControllableFragment {
             Log.e("WTF FAB", "loaded from cache");
 
             // cached gifs are shown without errors
-            randomFragmentViewModel.setError(new ErrorInfo(ErrorInfo.Error.NO_ERRORS));
-            loadEntryImage(Objects.requireNonNull(randomFragmentViewModel.getCurrentEntry().getValue().getGifURL()));
+            randomFragmentViewModel.setError(new ErrorInfo(LoadError.NO_ERRORS));
+            loadEntryImage(Objects.requireNonNull(Objects.requireNonNull(randomFragmentViewModel.getCurrentEntry().getValue()).getGifURL()));
         }
     }
 }

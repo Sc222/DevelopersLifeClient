@@ -1,4 +1,4 @@
-package ru.sc222.devslife.ui.main;
+package ru.sc222.devslife.viewmodel;
 
 import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;

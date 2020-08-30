@@ -1,4 +1,4 @@
-package ru.sc222.devslife;
+package ru.sc222.devslife.ui.activities;
 
 import android.os.Bundle;
 
@@ -10,7 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
 
-import ru.sc222.devslife.ui.main.SectionsPagerAdapter;
+import ru.sc222.devslife.R;
+import ru.sc222.devslife.ui.adapters.SectionsPagerAdapter;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 

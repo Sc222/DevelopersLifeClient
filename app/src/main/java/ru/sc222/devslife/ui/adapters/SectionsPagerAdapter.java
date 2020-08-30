@@ -1,4 +1,4 @@
-package ru.sc222.devslife.ui.main;
+package ru.sc222.devslife.ui.adapters;
 
 import android.content.Context;
 import android.view.ViewGroup;
@@ -12,6 +12,8 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import ru.sc222.devslife.R;
 import ru.sc222.devslife.ui.custom.ControllableFragment;
+import ru.sc222.devslife.ui.fragments.RandomFragment;
+import ru.sc222.devslife.ui.fragments.PlaceholderFragment;
 
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {

@@ -1,4 +1,4 @@
-package ru.sc222.devslife.ui.main;
+package ru.sc222.devslife.viewmodel;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.Objects;
 
+import ru.sc222.devslife.utils.LoadError;
+import ru.sc222.devslife.utils.ErrorInfo;
 import ru.sc222.devslife.utils.SimpleEntry;
 import ru.sc222.devslife.utils.SimpleLinkedList;
 import ru.sc222.devslife.utils.SimpleNode;
@@ -16,7 +18,7 @@ public class RandomFragmentViewModel extends ViewModel {
     private MutableLiveData<Boolean> canLoadPrevious=new MutableLiveData<>(false);
     private MutableLiveData<Boolean> canLoadNext = new MutableLiveData<>(false);
     private MutableLiveData<SimpleEntry> currentEntry=new MutableLiveData<>(null);
-    private MutableLiveData<ErrorInfo> error = new MutableLiveData<>(new ErrorInfo(ErrorInfo.Error.NO_ERRORS));
+    private MutableLiveData<ErrorInfo> error = new MutableLiveData<>(new ErrorInfo(LoadError.NO_ERRORS));
 
     //todo control linked list max size
     private SimpleLinkedList<SimpleEntry> entries= new SimpleLinkedList<>();
@@ -97,8 +99,8 @@ public class RandomFragmentViewModel extends ViewModel {
         currentEntry.setValue(entry);
     }
 
-    public void fixError(ErrorInfo.Error errorToBeFixed) {
+    public void fixError(LoadError errorToBeFixed) {
         if(Objects.requireNonNull(error.getValue()).getError()==errorToBeFixed)
-            error.setValue(new ErrorInfo(ErrorInfo.Error.NO_ERRORS));
+            error.setValue(new ErrorInfo(LoadError.NO_ERRORS));
     }
 }
