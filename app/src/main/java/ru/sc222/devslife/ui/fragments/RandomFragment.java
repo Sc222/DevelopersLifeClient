@@ -45,6 +45,8 @@ import ru.sc222.devslife.viewmodel.RandomFragmentViewModel;
 public class RandomFragment extends ControllableFragment {
 
     private boolean isVisible = false;
+    private boolean isFirstRun = true;
+
 
     private RandomFragmentViewModel randomFragmentViewModel;
     private AppCompatImageView imageViewEntry;
@@ -55,17 +57,14 @@ public class RandomFragment extends ControllableFragment {
     private Callback<Entry> entryCallback = new Callback<Entry>() {
         @Override
         public void onResponse(@NonNull Call<Entry> call, Response<Entry> response) {
-
             if (response.isSuccessful()) {
                 Entry entry = response.body();
                 assert entry != null;
                 randomFragmentViewModel.fixError(LoadError.CANT_LOAD_POST);
-
                 Log.e("Loaded", "entry author: " + entry.getDescription());
                 Log.e("Loaded", "entry desc: " + entry.getDescription());
                 Log.e("Loaded", "entry id: " + entry.getId());
                 Log.e("Loaded", "entry preview: " + entry.getPreviewURL());
-
                 if (entry.getType().equals(Entry.TYPE_COUB)) {
                     randomFragmentViewModel.setError(new ErrorInfo(LoadError.COUB_NOT_SUPPORTED));
                     Log.e("ERROR", "post onResponse: " + "UNSUPPORTED COUB POST");
@@ -191,8 +190,6 @@ public class RandomFragment extends ControllableFragment {
                 toolbarEntry.setVisibility(View.VISIBLE);
             }
         });
-
-        loadEntry();
         return root;
     }
 
@@ -245,6 +242,20 @@ public class RandomFragment extends ControllableFragment {
         loadEntry();
     }
 
+    private void loadRandomEntryFromSite() {
+        //load new entry if there are no cached
+        APIInterface service = ServiceGenerator.getRetrofit().create(APIInterface.class);
+        service.getRandomEntry().enqueue(entryCallback);
+    }
+
+    private void setDefaultColors() {
+        //set default colors
+        UiColorSet colorSet = randomFragmentViewModel.getDefaultColorSet();
+        toolbarEntry.setBackgroundColor(colorSet.getBgColor());
+        titleEntry.setTextColor(colorSet.getTitleColor());
+        subtitleEntry.setTextColor(colorSet.getSubtitleColor());
+    }
+
     private void loadEntry() {
         Glide.with(Objects.requireNonNull(getContext())).clear(imageViewEntry);
 
@@ -252,16 +263,8 @@ public class RandomFragment extends ControllableFragment {
             randomFragmentViewModel.setCanLoadNext(false);
             Log.e("Error", "No cached previous entries");
             Log.e("LOAD", "Loading from web");
-
-            //load new entry if there are no cached
-            APIInterface service = ServiceGenerator.getRetrofit().create(APIInterface.class);
-            service.getRandomEntry().enqueue(entryCallback);
-
-            //set default colors
-            UiColorSet colorSet = randomFragmentViewModel.getDefaultColorSet();
-            toolbarEntry.setBackgroundColor(colorSet.getBgColor());
-            titleEntry.setTextColor(colorSet.getTitleColor());
-            subtitleEntry.setTextColor(colorSet.getSubtitleColor());
+            loadRandomEntryFromSite();
+            setDefaultColors();
         } else {
             Log.e("Nice", "Load next entry from cache");
             loadEntryImage(Objects.requireNonNull(randomFragmentViewModel.getCurrentEntry().getValue()).getGifURL());
@@ -292,5 +295,10 @@ public class RandomFragment extends ControllableFragment {
     public void setIsVisible(boolean isVisible) {
         this.isVisible = isVisible;
         Log.e("RANDOM", "BECOMES: " + isVisible);
+        if (isFirstRun && isVisible) {
+            Log.e("random", "LOAD ENTRY FIRST TIME");
+            isFirstRun = false;
+            loadRandomEntryFromSite();
+        }
     }
 }

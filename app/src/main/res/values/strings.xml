@@ -2,7 +2,7 @@
     <string name="app_name">Devs Life</string>
     <string name="tab_random">Random</string>
     <string name="tab_latest">Latest</string>
-    <string name="tab_best">Best</string>
+    <string name="tab_top">Top</string>
     <string name="tab_hot">Hot</string>
     <string name="collapsing_toolbar_subtitle">Смешные гиф-анимации о жизни разработчиков</string>
     <string name="collapsing_toolbar_title">Developers Life</string>

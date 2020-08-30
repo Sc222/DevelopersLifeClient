@@ -1,6 +1,7 @@
 package ru.sc222.devslife.ui.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -19,12 +20,12 @@ import ru.sc222.devslife.ui.fragments.RandomFragment;
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_random, R.string.tab_latest, R.string.tab_best, R.string.tab_hot};
+    private static final int[] TAB_TITLES = new int[]{R.string.tab_random, R.string.tab_latest, R.string.tab_top, R.string.tab_hot};
 
     private static final int NEWSFEED_FIRST_INDEX = 1;
     private static final String[] NEWSFEED_TYPES = new String[]{
             NewsfeedFragment.NEWSFEED_TYPE_LATEST,
-            NewsfeedFragment.NEWSFEED_TYPE_BEST,
+            NewsfeedFragment.NEWSFEED_TYPE_TOP,
             NewsfeedFragment.NEWSFEED_TYPE_HOT
     };
     private final Context mContext;
@@ -55,6 +56,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @NonNull
     @Override
     public Fragment getItem(int position) {
+        Log.e("get item", "position: " + position);
         switch (position) {
             //all fragments must be children of ControllableFragment
             case 0:
