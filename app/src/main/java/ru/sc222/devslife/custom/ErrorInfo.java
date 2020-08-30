@@ -19,10 +19,6 @@ public class ErrorInfo {
         return error != LoadError.NO_ERRORS;
     }
 
-    public boolean hasNetworkErrors() {
-        return error != LoadError.COUB_NOT_SUPPORTED && error != LoadError.NO_ERRORS;
-    }
-
     public String getRetryUrl() {
         return retryUrl;
     }

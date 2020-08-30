@@ -12,14 +12,21 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import ru.sc222.devslife.R;
 import ru.sc222.devslife.ui.custom.ControllableFragment;
+import ru.sc222.devslife.ui.fragments.NewsfeedFragment;
 import ru.sc222.devslife.ui.fragments.RandomFragment;
-import ru.sc222.devslife.ui.fragments.PlaceholderFragment;
 
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
     private static final int[] TAB_TITLES = new int[]{R.string.tab_random, R.string.tab_latest, R.string.tab_best, R.string.tab_hot};
+
+    private static final int NEWSFEED_FIRST_INDEX = 1;
+    private static final String[] NEWSFEED_TYPES = new String[]{
+            NewsfeedFragment.NEWSFEED_TYPE_LATEST,
+            NewsfeedFragment.NEWSFEED_TYPE_BEST,
+            NewsfeedFragment.NEWSFEED_TYPE_HOT
+    };
     private final Context mContext;
     private ControllableFragment mCurrentFragment;
 
@@ -35,7 +42,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public void setPrimaryItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         if (getCurrentFragment() != object) {
+            ControllableFragment mPrevSelectedFragment = mCurrentFragment;
+            if (mPrevSelectedFragment != null)
+                mPrevSelectedFragment.setIsVisible(false);
             mCurrentFragment = ((ControllableFragment) object);
+            mCurrentFragment.setIsVisible(true);
         }
         super.setPrimaryItem(container, position, object);
     }
@@ -49,7 +60,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return new RandomFragment();
             default:
-                return PlaceholderFragment.newInstance(position + 1);
+                return NewsfeedFragment.newInstance(NEWSFEED_TYPES[position - NEWSFEED_FIRST_INDEX]);
         }
     }
 

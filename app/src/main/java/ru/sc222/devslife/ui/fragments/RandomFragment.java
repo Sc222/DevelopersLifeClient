@@ -44,6 +44,8 @@ import ru.sc222.devslife.viewmodel.RandomFragmentViewModel;
 
 public class RandomFragment extends ControllableFragment {
 
+    private boolean isVisible = false;
+
     private RandomFragmentViewModel randomFragmentViewModel;
     private AppCompatImageView imageViewEntry;
     private LinearLayoutCompat toolbarEntry;
@@ -97,6 +99,7 @@ public class RandomFragment extends ControllableFragment {
         randomFragmentViewModel = new ViewModelProvider(this).get(RandomFragmentViewModel.class);
     }
 
+
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -133,9 +136,17 @@ public class RandomFragment extends ControllableFragment {
                         loadProgress.setVisibility(View.VISIBLE);
                 });
 
-        randomFragmentViewModel.getCanLoadNext().observe(getViewLifecycleOwner(),fabNext::setEnabled);
+        randomFragmentViewModel.getCanLoadNext().observe(getViewLifecycleOwner(), enabled ->
+        {
+            if (isVisible)
+                fabNext.setEnabled(enabled);
+        });
 
-        randomFragmentViewModel.getCanLoadPrevious().observe(getViewLifecycleOwner(), fabPrevious::setEnabled);
+        randomFragmentViewModel.getCanLoadPrevious().observe(getViewLifecycleOwner(), enabled ->
+        {
+            if (isVisible)
+                fabPrevious.setEnabled(enabled);
+        });
 
         LinearLayoutCompat errorLayout = root.findViewById(R.id.error_layout);
         AppCompatImageView errorIcon = root.findViewById(R.id.error_icon);
@@ -160,6 +171,7 @@ public class RandomFragment extends ControllableFragment {
                         errorIcon.setImageResource(R.drawable.ic_sorry);
                         errorTitle.setText(R.string.error_coub);
                         errorButton.setText(R.string.button_next_post);
+                        randomFragmentViewModel.setCanLoadNext(false);
                         break;
                 }
 
@@ -200,7 +212,7 @@ public class RandomFragment extends ControllableFragment {
                         if (model instanceof String)
                             randomFragmentViewModel.setError(new ErrorInfo(LoadError.CANT_LOAD_IMAGE, (String) model));
                         assert e != null;
-                        Log.e("ERROR", "image onLoadFailed: "+e.getMessage());
+                        Log.e("ERROR", "image onLoadFailed: " + e.getMessage());
                         return false;
                     }
 
@@ -218,6 +230,12 @@ public class RandomFragment extends ControllableFragment {
                     }
                 })
                 .into(imageViewEntry);
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        Log.e("fragment RANDOM", "visibility: " + hidden);
     }
 
     @Override
@@ -258,5 +276,21 @@ public class RandomFragment extends ControllableFragment {
             Log.e("Nice", "Load previous entry from cache");
             loadEntryImage(Objects.requireNonNull(Objects.requireNonNull(randomFragmentViewModel.getCurrentEntry().getValue()).getGifURL()));
         }
+    }
+
+    @Override
+    public boolean isFabNextEnabled() {
+        return randomFragmentViewModel.getCanLoadNext().getValue();
+    }
+
+    @Override
+    public boolean isFabPreviousEnabled() {
+        return randomFragmentViewModel.getCanLoadPrevious().getValue();
+    }
+
+    @Override
+    public void setIsVisible(boolean isVisible) {
+        this.isVisible = isVisible;
+        Log.e("RANDOM", "BECOMES: " + isVisible);
     }
 }

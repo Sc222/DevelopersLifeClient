@@ -25,7 +25,7 @@ public class RandomFragmentViewModel extends AndroidViewModel {
     private MutableLiveData<ErrorInfo> error = new MutableLiveData<>(new ErrorInfo(LoadError.NO_ERRORS));
 
     private final UiColorSet defaultColorSet;
-    
+
     //todo control linked list max size
     private SimpleLinkedList<SimpleEntry> entries = new SimpleLinkedList<>();
     private SimpleNode<SimpleEntry> currentEntryListNode = null;
@@ -56,8 +56,8 @@ public class RandomFragmentViewModel extends AndroidViewModel {
     }
 
     public void updateCanLoadPrevious() {
-        boolean hasNetworkErrors = Objects.requireNonNull(this.error.getValue()).hasNetworkErrors();
-        this.canLoadPrevious.setValue(!hasNetworkErrors && currentEntryListNode != null && currentEntryListNode.getPrevious() != null);
+        boolean hasErrors = Objects.requireNonNull(this.error.getValue()).hasErrors();
+        this.canLoadPrevious.setValue(!hasErrors && currentEntryListNode != null && currentEntryListNode.getPrevious() != null);
     }
 
     public MutableLiveData<Boolean> getCanLoadNext() {
