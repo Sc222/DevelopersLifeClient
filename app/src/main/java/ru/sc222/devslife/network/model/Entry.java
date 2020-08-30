@@ -1,9 +1,9 @@
-package ru.sc222.devslife.network;
+package ru.sc222.devslife.network.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import ru.sc222.devslife.core.SimpleEntry;
+import ru.sc222.devslife.utils.SimpleEntry;
 
 public class Entry {
 
@@ -63,7 +63,9 @@ public class Entry {
 
     public SimpleEntry buildSimpleEntry()
     {
-        return new SimpleEntry(id, description, votes, author, gifURL);
+        //json response has http gif link, we need to make it https
+        String httpsGifUrl = gifURL.replaceFirst("https?", "https");
+        return new SimpleEntry(id, description, votes, author, httpsGifUrl);
     }
 
     public Integer getId() {

@@ -1,4 +1,4 @@
-package ru.sc222.devslife.core;
+package ru.sc222.devslife.utils;
 
 public class SimpleNode<T> {
     private T item;

@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import ru.sc222.devslife.R;
-import ru.sc222.devslife.ui.ControllableFragment;
+import ru.sc222.devslife.ui.custom.ControllableFragment;
 
 /**
  * A placeholder fragment containing a simple view.

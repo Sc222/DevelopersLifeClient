@@ -1,4 +1,4 @@
-package ru.sc222.devslife.ui;
+package ru.sc222.devslife.ui.custom;
 
 import androidx.fragment.app.Fragment;
 

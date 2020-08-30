@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
@@ -27,17 +28,17 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.IOException;
 import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.sc222.devslife.R;
-import ru.sc222.devslife.core.SimpleEntry;
 import ru.sc222.devslife.network.APIInterface;
-import ru.sc222.devslife.ui.ControllableFragment;
-import ru.sc222.devslife.network.Entry;
+import ru.sc222.devslife.network.model.Entry;
 import ru.sc222.devslife.network.ServiceGenerator;
+import ru.sc222.devslife.ui.custom.ControllableFragment;
 
 public class RandomFragment extends ControllableFragment {
 
@@ -57,26 +58,36 @@ public class RandomFragment extends ControllableFragment {
             if (response.isSuccessful()) {
                 Entry entry = response.body();
                 assert entry != null;
+                randomFragmentViewModel.fixError(ErrorInfo.Error.CANT_LOAD_POST);
+
                 Log.e("Loaded", "entry author: " + entry.getDescription());
                 Log.e("Loaded", "entry desc: " + entry.getDescription());
                 Log.e("Loaded", "entry id: " + entry.getId());
                 Log.e("Loaded", "entry preview: " + entry.getPreviewURL());
 
                 if (entry.getType().equals(Entry.TYPE_COUB)) {
-                    Log.e("Bad random post", "it has " + entry.getType() + " type");
-                    //todo SHOW UNSUPPORTED POST ERROR MESSAGE
+                    randomFragmentViewModel.setError(new ErrorInfo(ErrorInfo.Error.COUB_NOT_SUPPORTED));
+                    Log.e("ERROR", "post onResponse: " + "UNSUPPORTED COUB POST");
                 } else {
+                    randomFragmentViewModel.fixError(ErrorInfo.Error.COUB_NOT_SUPPORTED);
                     randomFragmentViewModel.addEntry(entry.buildSimpleEntry());
-                    loadEntryImage(entry.buildSimpleEntry());
+                    loadEntryImage(entry.buildSimpleEntry().getGifURL());
                 }
             } else {
-                //todo SHOW ERROR
+                try {
+                    assert response.errorBody() != null;
+                    randomFragmentViewModel.setError(new ErrorInfo(ErrorInfo.Error.CANT_LOAD_POST));
+                    Log.e("ERROR", "post onResponse: " + response.errorBody().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
         @Override
         public void onFailure(@NonNull Call<Entry> call, @NonNull Throwable t) {
-            //todo SHOW ERROR
+            randomFragmentViewModel.setError(new ErrorInfo(ErrorInfo.Error.CANT_LOAD_POST));
+            Log.e("ERROR", "post onFailure: " + t.toString());
         }
     };
 
@@ -120,47 +131,93 @@ public class RandomFragment extends ControllableFragment {
         ProgressBar loadProgress = root.findViewById(R.id.entry_progressbar);
         FloatingActionButton fabPrevious = Objects.requireNonNull(getActivity()).findViewById(R.id.fab_previous);
         FloatingActionButton fabNext = getActivity().findViewById(R.id.fab_next);
-        //TODO ANIMATE FAB TRANSITION
         randomFragmentViewModel.getIsCurrentEntryImageLoaded().observe(getViewLifecycleOwner(),
                 isLoaded -> {
-                    fabNext.setEnabled(isLoaded);
                     if (isLoaded)
                         loadProgress.setVisibility(View.INVISIBLE);
                     else
                         loadProgress.setVisibility(View.VISIBLE);
                 });
 
+        randomFragmentViewModel.getCanLoadNext().observe(getViewLifecycleOwner(),fabNext::setEnabled);
+
         //TODO ANIMATE FAB TRANSITION
         randomFragmentViewModel.getCanLoadPrevious().observe(getViewLifecycleOwner(), fabPrevious::setEnabled);
+
+        LinearLayoutCompat errorLayout = root.findViewById(R.id.error_layout);
+        AppCompatImageView errorIcon = root.findViewById(R.id.error_icon);
+        AppCompatTextView errorTitle = root.findViewById(R.id.error_title);
+        Button errorButton = root.findViewById(R.id.error_button);
+        randomFragmentViewModel.getError().observe(getViewLifecycleOwner(), errorInfo -> {
+            if (errorInfo.hasErrors()) {
+                imageViewEntry.setImageResource(R.drawable.gray);
+                toolbarEntry.setVisibility(View.GONE);
+                errorLayout.setVisibility(View.VISIBLE);
+
+                switch (errorInfo.getError()) {
+                    case CANT_LOAD_POST:
+                    case CANT_LOAD_IMAGE:
+                        errorIcon.setImageResource(R.drawable.ic_offline);
+                        errorTitle.setText(R.string.error_offline);
+                        errorButton.setText(R.string.button_retry);
+                        randomFragmentViewModel.setCanLoadPrevious(false);
+                        randomFragmentViewModel.setCanLoadNext(false);
+                        break;
+                    case COUB_NOT_SUPPORTED:
+                        errorIcon.setImageResource(R.drawable.ic_sorry);
+                        errorTitle.setText(R.string.error_coub);
+                        errorButton.setText(R.string.button_next_post);
+                        break;
+                }
+
+                errorButton.setOnClickListener(view -> {
+                    switch (errorInfo.getError()) {
+                        case CANT_LOAD_POST:
+                        case COUB_NOT_SUPPORTED:
+                            loadEntry();
+                            break;
+                        case CANT_LOAD_IMAGE:
+                            loadEntryImage(errorInfo.getRetryUrl());
+                            break;
+                    }
+                });
+            } else {
+                errorLayout.setVisibility(View.GONE);
+                toolbarEntry.setVisibility(View.VISIBLE);
+            }
+        });
 
         loadEntry();
         return root;
     }
 
-    private void loadEntryImage(SimpleEntry entry) {
-
-        //next image can't be loaded while current wasn't
+    private void loadEntryImage(String url) {
         randomFragmentViewModel.setIsCurrentEntryImageLoaded(false);
-        Log.e("Loaded", "entry desc: " + entry.getDescription());
-        Log.e("Loaded", "entry gif: " + entry.getGifURL());
+        randomFragmentViewModel.setCanLoadNext(false);
 
-        String correctGifUrl = entry.getGifURL().replaceFirst("http", "https");
-        Log.e("Loaded", "url: " + correctGifUrl);
+        Log.e("Loaded", "image url: " + url);
         Glide.with(Objects.requireNonNull(getActivity()))
                 .asGif()
-                .load(correctGifUrl)
+                .load(url)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.entry_placeholder)
+                .placeholder(R.drawable.gray)
                 .listener(new RequestListener<GifDrawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
-                        Log.e("ERROR", "ERROR LOADING IMAGE");
+                        if (model instanceof String)
+                            randomFragmentViewModel.setError(new ErrorInfo(ErrorInfo.Error.CANT_LOAD_IMAGE, (String) model));
+
+                        assert e != null;
+                        Log.e("ERROR", "image onLoadFailed: "+e.getMessage());
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(GifDrawable resource, Object model, Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
+                        randomFragmentViewModel.fixError(ErrorInfo.Error.CANT_LOAD_IMAGE);
+
                         randomFragmentViewModel.setIsCurrentEntryImageLoaded(true);
+                        randomFragmentViewModel.setCanLoadNext(true);
                         if (dataSource == DataSource.REMOTE) {
                             Bitmap firstFrame = resource.getFirstFrame();
                             Palette p = Palette.from(firstFrame).generate();
@@ -183,6 +240,8 @@ public class RandomFragment extends ControllableFragment {
 
     @Override
     public void fabNextClicked() {
+        titleEntry.setText("");
+        subtitleEntry.setText("");
         loadEntry();
     }
 
@@ -201,18 +260,20 @@ public class RandomFragment extends ControllableFragment {
             subtitleEntry.setTextColor(defaultSubtitleColor);
         } else {
             Log.e("LOADED CACHED", "LOADED CACHED");
-            loadEntryImage(Objects.requireNonNull(randomFragmentViewModel.getCurrentEntry().getValue()));
+            loadEntryImage(Objects.requireNonNull(randomFragmentViewModel.getCurrentEntry().getValue()).getGifURL());
         }
     }
 
     @Override
     public void fabPreviousClicked() {
-
         if (!randomFragmentViewModel.switchToPreviousEntry()) {
             Log.e("HIDE FAB", "AAAA");
         } else {
             Log.e("WTF FAB", "loaded from cache");
-            loadEntryImage(Objects.requireNonNull(randomFragmentViewModel.getCurrentEntry().getValue()));
+
+            // cached gifs are shown without errors
+            randomFragmentViewModel.setError(new ErrorInfo(ErrorInfo.Error.NO_ERRORS));
+            loadEntryImage(Objects.requireNonNull(randomFragmentViewModel.getCurrentEntry().getValue().getGifURL()));
         }
     }
 }

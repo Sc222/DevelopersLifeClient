@@ -6,4 +6,8 @@
     <string name="tab_hot">Hot</string>
     <string name="collapsing_toolbar_subtitle">Смешные гиф-анимации о жизни разработчиков</string>
     <string name="collapsing_toolbar_title">Developers Life</string>
+    <string name="error_offline">Произошла ошибка при загрузке данных. Проверьте подключение к сети</string>
+    <string name="button_retry">Повторить</string>
+    <string name="error_coub">Произошла ошибка при загрузке данных. К сожалению, Coub посты не поддерживаются.</string>
+    <string name="button_next_post">Следующий пост</string>
 </resources>

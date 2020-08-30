@@ -4,33 +4,31 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import ru.sc222.devslife.core.SimpleEntry;
-import ru.sc222.devslife.core.SimpleLinkedList;
-import ru.sc222.devslife.core.SimpleNode;
+import java.util.Objects;
+
+import ru.sc222.devslife.utils.SimpleEntry;
+import ru.sc222.devslife.utils.SimpleLinkedList;
+import ru.sc222.devslife.utils.SimpleNode;
 
 public class RandomFragmentViewModel extends ViewModel {
 
-    private MutableLiveData<Boolean> isCurrentEntryImageLoaded;
-    private MutableLiveData<Boolean> canLoadPrevious;
-    private MutableLiveData<SimpleEntry> currentEntry;
+    private MutableLiveData<Boolean> isCurrentEntryImageLoaded=new MutableLiveData<>(false);
+    private MutableLiveData<Boolean> canLoadPrevious=new MutableLiveData<>(false);
+    private MutableLiveData<Boolean> canLoadNext = new MutableLiveData<>(false);
+    private MutableLiveData<SimpleEntry> currentEntry=new MutableLiveData<>(null);
+    private MutableLiveData<ErrorInfo> error = new MutableLiveData<>(new ErrorInfo(ErrorInfo.Error.NO_ERRORS));
 
     //todo control linked list max size
-    private SimpleLinkedList<SimpleEntry> entries;
-    private SimpleNode<SimpleEntry> currentEntryListNode;
+    private SimpleLinkedList<SimpleEntry> entries= new SimpleLinkedList<>();
+    private SimpleNode<SimpleEntry> currentEntryListNode=null;
 
 
-    public RandomFragmentViewModel() {
-        isCurrentEntryImageLoaded = new MutableLiveData<>();
-        isCurrentEntryImageLoaded.setValue(false);
+    public MutableLiveData<ErrorInfo> getError() {
+        return error;
+    }
 
-        canLoadPrevious = new MutableLiveData<>();
-        canLoadPrevious.setValue(false);
-
-        currentEntry = new MutableLiveData<>();
-        currentEntry.setValue(null);
-
-        entries = new SimpleLinkedList<>();
-        currentEntryListNode = null;
+    public void setError(ErrorInfo error) {
+        this.error.setValue(error);
     }
 
     public MutableLiveData<Boolean> getIsCurrentEntryImageLoaded() {
@@ -49,6 +47,18 @@ public class RandomFragmentViewModel extends ViewModel {
         this.canLoadPrevious.setValue(canLoadPrevious);
     }
 
+    public void updateCanLoadPrevious() {
+        this.canLoadPrevious.setValue(currentEntryListNode.getPrevious()!=null);
+    }
+
+    public MutableLiveData<Boolean> getCanLoadNext() {
+        return canLoadNext;
+    }
+
+    public void setCanLoadNext(boolean canLoadNext) {
+        this.canLoadNext.setValue(canLoadNext);
+    }
+
     public LiveData<SimpleEntry> getCurrentEntry() {
         return currentEntry;
     }
@@ -57,12 +67,13 @@ public class RandomFragmentViewModel extends ViewModel {
         currentEntry.setValue(entry);
         entries.addLast(entry);
         currentEntryListNode = entries.getLast();
-        setCanLoadPrevious(currentEntryListNode.getPrevious()!=null);
+        updateCanLoadPrevious();
     }
 
     public boolean switchToNextEntry() {
         if (currentEntryListNode != null && currentEntryListNode.getNext() != null) {
             currentEntryListNode = currentEntryListNode.getNext();
+            updateCanLoadPrevious();
             currentEntry.setValue(currentEntryListNode.getItem());
             return true;
         }
@@ -72,7 +83,7 @@ public class RandomFragmentViewModel extends ViewModel {
     public boolean switchToPreviousEntry() {
         if (currentEntryListNode != null && currentEntryListNode.getPrevious() != null) {
             currentEntryListNode = currentEntryListNode.getPrevious();
-            setCanLoadPrevious(currentEntryListNode.getPrevious()!=null);
+            updateCanLoadPrevious();
             currentEntry.setValue(currentEntryListNode.getItem());
             return true;
         }
@@ -86,4 +97,8 @@ public class RandomFragmentViewModel extends ViewModel {
         currentEntry.setValue(entry);
     }
 
+    public void fixError(ErrorInfo.Error errorToBeFixed) {
+        if(Objects.requireNonNull(error.getValue()).getError()==errorToBeFixed)
+            error.setValue(new ErrorInfo(ErrorInfo.Error.NO_ERRORS));
+    }
 }

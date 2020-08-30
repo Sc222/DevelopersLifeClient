@@ -1,4 +1,4 @@
-package ru.sc222.devslife.core;
+package ru.sc222.devslife.utils;
 
 public class SimpleEntry {
     private final Integer id;
