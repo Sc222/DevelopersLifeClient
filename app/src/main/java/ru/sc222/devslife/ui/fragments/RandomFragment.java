@@ -208,8 +208,7 @@ public class RandomFragment extends ControllableFragment {
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
                         if (model instanceof String)
                             randomFragmentViewModel.setError(new ErrorInfo(LoadError.CANT_LOAD_IMAGE, (String) model));
-                        assert e != null;
-                        Log.e("ERROR", "image onLoadFailed: " + e.getMessage());
+                        Log.e("ERROR", "image onLoadFailed");
                         return false;
                     }
 

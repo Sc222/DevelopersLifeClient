@@ -1,13 +1,16 @@
 <resources>
-    <string name="app_name">Devs Life</string>
+    <string name="app_name" translatable="false">Devs Life</string>
     <string name="tab_random">Random</string>
     <string name="tab_latest">Latest</string>
     <string name="tab_top">Top</string>
     <string name="tab_hot">Hot</string>
-    <string name="collapsing_toolbar_subtitle">Смешные гиф-анимации о жизни разработчиков</string>
-    <string name="collapsing_toolbar_title">Developers Life</string>
-    <string name="error_offline">Произошла ошибка при загрузке данных. Проверьте подключение к сети</string>
-    <string name="button_retry">Повторить</string>
-    <string name="error_coub">Произошла ошибка при загрузке данных. К сожалению, Coub посты не поддерживаются.</string>
-    <string name="button_next_post">Следующий пост</string>
+    <string name="collapsing_toolbar_subtitle">Funny gifs about developers life</string>
+    <string name="collapsing_toolbar_title" translatable="false">Developers Life</string>
+    <string name="error_offline">Error loading data. Check your internet connection.</string>
+    <string name="button_retry">Retry</string>
+    <string name="error_coub">Error loading data. Sadly, Coub videos are not supported.</string>
+    <string name="button_next_post">Next post</string>
+    <string name="error_offline_short">No internet connection</string>
+    <string name="error_coub_short">Coub videos are not supported\n</string>
+    <string name="no_posts">It seems that there are no posts on this page.</string>
 </resources>

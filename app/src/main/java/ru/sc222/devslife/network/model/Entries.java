@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Entries {
 
-    public static final int PREFERRED_PAGE_SIZE = 10;
+    public static final int PREFERRED_PAGE_SIZE = 20;
     public static final String PREFERRED_TYPES = "gif";
 
     @SerializedName("result")

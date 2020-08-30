@@ -64,8 +64,10 @@ public class Entry {
     public SimpleEntry buildSimpleEntry()
     {
         //json response has http gif link, we need to make it https
-        String httpsGifUrl = gifURL.replaceFirst("https?", "https");
-        return new SimpleEntry(id, description, votes, author, httpsGifUrl);
+        String correctUrl = "";
+        if (gifURL != null && gifURL.startsWith("http"))
+            correctUrl = gifURL.replaceFirst("https?", "https");
+        return new SimpleEntry(id, description, votes, author, correctUrl);
     }
 
     public Integer getId() {

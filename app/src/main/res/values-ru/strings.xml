@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_random">Рандомн</string>
+    <string name="tab_latest">Последнее</string>
+    <string name="tab_top">Лучшее</string>
+    <string name="tab_hot">Горячее</string>
+    <string name="collapsing_toolbar_subtitle">Смешные гиф-анимации о жизни разработчиков</string>
+    <string name="error_offline">Произошла ошибка при загрузке данных. Проверьте свое подключение к сети.</string>
+    <string name="button_retry">Повторить</string>
+    <string name="error_coub">Произошла ошибка при загрузке данных. К сожалению, Coub-видео не поддерживаются.</string>
+    <string name="button_next_post">Следующий пост</string>
+    <string name="error_offline_short">Нет подключения к сети</string>
+    <string name="error_coub_short">Coub-видео не поддерживаются</string>
+    <string name="no_posts">Похоже, что на этой странице совсем нет постов.</string>
+</resources>
