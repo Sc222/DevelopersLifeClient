@@ -1,4 +1,4 @@
-package ru.sc222.devslife.utils;
+package ru.sc222.devslife.custom;
 
 
 public class ErrorInfo {
@@ -19,6 +19,10 @@ public class ErrorInfo {
         return error != LoadError.NO_ERRORS;
     }
 
+    public boolean hasNetworkErrors() {
+        return error != LoadError.COUB_NOT_SUPPORTED && error != LoadError.NO_ERRORS;
+    }
+
     public String getRetryUrl() {
         return retryUrl;
     }
@@ -27,4 +31,6 @@ public class ErrorInfo {
     public LoadError getError() {
         return error;
     }
+
+
 }

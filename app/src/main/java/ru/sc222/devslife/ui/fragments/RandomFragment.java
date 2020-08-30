@@ -14,10 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.LinearLayoutCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.ColorUtils;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.palette.graphics.Palette;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -35,12 +32,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.sc222.devslife.R;
+import ru.sc222.devslife.custom.ErrorInfo;
+import ru.sc222.devslife.custom.LoadError;
+import ru.sc222.devslife.custom.UiColorSet;
 import ru.sc222.devslife.network.APIInterface;
-import ru.sc222.devslife.network.model.Entry;
 import ru.sc222.devslife.network.ServiceGenerator;
+import ru.sc222.devslife.network.model.Entry;
 import ru.sc222.devslife.ui.custom.ControllableFragment;
-import ru.sc222.devslife.utils.ErrorInfo;
-import ru.sc222.devslife.utils.LoadError;
+import ru.sc222.devslife.utils.PaletteUtils;
 import ru.sc222.devslife.viewmodel.RandomFragmentViewModel;
 
 public class RandomFragment extends ControllableFragment {
@@ -50,9 +49,6 @@ public class RandomFragment extends ControllableFragment {
     private LinearLayoutCompat toolbarEntry;
     private AppCompatTextView titleEntry;
     private AppCompatTextView subtitleEntry;
-    private int defaultBgColor;
-    private int defaultTitleColor;
-    private int defaultSubtitleColor;
 
     private Callback<Entry> entryCallback = new Callback<Entry>() {
         @Override
@@ -98,10 +94,7 @@ public class RandomFragment extends ControllableFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        randomFragmentViewModel = ViewModelProviders.of(this).get(RandomFragmentViewModel.class);
-        defaultBgColor = ContextCompat.getColor(Objects.requireNonNull(getContext()), R.color.default_bg_color);
-        defaultTitleColor = ContextCompat.getColor(getContext(), R.color.default_title_color);
-        defaultSubtitleColor = ContextCompat.getColor(getContext(), R.color.default_subtitle_color);
+        randomFragmentViewModel = new ViewModelProvider(this).get(RandomFragmentViewModel.class);
     }
 
     @Override
@@ -119,15 +112,13 @@ public class RandomFragment extends ControllableFragment {
                 Log.e("update curr", "update");
                 titleEntry.setText(entry.getAuthor());
                 subtitleEntry.setText(entry.getDescription());
-                if (entry.areColorsSet()) {
-                    toolbarEntry.setBackgroundColor(entry.getBgColor());
-                    titleEntry.setTextColor(entry.getTitleColor());
-                    subtitleEntry.setTextColor(entry.getSubtitleColor());
-                } else {
-                    toolbarEntry.setBackgroundColor(defaultBgColor);
-                    titleEntry.setTextColor(defaultTitleColor);
-                    subtitleEntry.setTextColor(defaultSubtitleColor);
-                }
+
+                UiColorSet colorSet = entry.getColorSet();
+                if (colorSet == null)
+                    colorSet = randomFragmentViewModel.getDefaultColorSet();
+                toolbarEntry.setBackgroundColor(colorSet.getBgColor());
+                titleEntry.setTextColor(colorSet.getTitleColor());
+                subtitleEntry.setTextColor(colorSet.getSubtitleColor());
             }
         });
 
@@ -144,7 +135,6 @@ public class RandomFragment extends ControllableFragment {
 
         randomFragmentViewModel.getCanLoadNext().observe(getViewLifecycleOwner(),fabNext::setEnabled);
 
-        //TODO ANIMATE FAB TRANSITION
         randomFragmentViewModel.getCanLoadPrevious().observe(getViewLifecycleOwner(), fabPrevious::setEnabled);
 
         LinearLayoutCompat errorLayout = root.findViewById(R.id.error_layout);
@@ -152,6 +142,7 @@ public class RandomFragment extends ControllableFragment {
         AppCompatTextView errorTitle = root.findViewById(R.id.error_title);
         Button errorButton = root.findViewById(R.id.error_button);
         randomFragmentViewModel.getError().observe(getViewLifecycleOwner(), errorInfo -> {
+            randomFragmentViewModel.updateCanLoadPrevious();
             if (errorInfo.hasErrors()) {
                 imageViewEntry.setImageResource(R.drawable.gray);
                 toolbarEntry.setVisibility(View.GONE);
@@ -163,7 +154,6 @@ public class RandomFragment extends ControllableFragment {
                         errorIcon.setImageResource(R.drawable.ic_offline);
                         errorTitle.setText(R.string.error_offline);
                         errorButton.setText(R.string.button_retry);
-                        randomFragmentViewModel.setCanLoadPrevious(false);
                         randomFragmentViewModel.setCanLoadNext(false);
                         break;
                     case COUB_NOT_SUPPORTED:
@@ -209,7 +199,6 @@ public class RandomFragment extends ControllableFragment {
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
                         if (model instanceof String)
                             randomFragmentViewModel.setError(new ErrorInfo(LoadError.CANT_LOAD_IMAGE, (String) model));
-
                         assert e != null;
                         Log.e("ERROR", "image onLoadFailed: "+e.getMessage());
                         return false;
@@ -218,22 +207,12 @@ public class RandomFragment extends ControllableFragment {
                     @Override
                     public boolean onResourceReady(GifDrawable resource, Object model, Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
                         randomFragmentViewModel.fixError(LoadError.CANT_LOAD_IMAGE);
-
                         randomFragmentViewModel.setIsCurrentEntryImageLoaded(true);
                         randomFragmentViewModel.setCanLoadNext(true);
                         if (dataSource == DataSource.REMOTE) {
-                            Bitmap firstFrame = resource.getFirstFrame();
-                            Palette p = Palette.from(firstFrame).generate();
-                            Palette.Swatch vibrantSwatch = p.getVibrantSwatch();
-                            if (vibrantSwatch != null) {
-                                Log.e("NICE", "NICE PALETTE");
-                                int bgColor = ColorUtils.setAlphaComponent(vibrantSwatch.getRgb(), 204);
-                                int titleColor = vibrantSwatch.getTitleTextColor();
-                                int subTitleColor = vibrantSwatch.getBodyTextColor();
-                                randomFragmentViewModel.updateEntryColors(bgColor, titleColor, subTitleColor);
-                            } else {
-                                Log.e("bad", "BAD PALETTE");
-                            }
+                            Bitmap bitmap = resource.getFirstFrame();
+                            UiColorSet colorSet = PaletteUtils.getColorsFromBitmap(bitmap, randomFragmentViewModel.getDefaultColorSet());
+                            randomFragmentViewModel.setColorSet(colorSet);
                         }
                         return false;
                     }
@@ -251,31 +230,32 @@ public class RandomFragment extends ControllableFragment {
     private void loadEntry() {
         Glide.with(Objects.requireNonNull(getContext())).clear(imageViewEntry);
 
-        if (!randomFragmentViewModel.switchToNextEntry()) {
+        if (!randomFragmentViewModel.switchToNextCachedEntry()) {
+            randomFragmentViewModel.setCanLoadNext(false);
+            Log.e("Error", "No cached previous entries");
+            Log.e("LOAD", "Loading from web");
 
-            Log.e("LOAD FROM WEB", "LOAD FROM WEB");
             //load new entry if there are no cached
             APIInterface service = ServiceGenerator.getRetrofit().create(APIInterface.class);
             service.getRandomEntry().enqueue(entryCallback);
 
-            toolbarEntry.setBackgroundColor(defaultBgColor);
-            titleEntry.setTextColor(defaultTitleColor);
-            subtitleEntry.setTextColor(defaultSubtitleColor);
+            //set default colors
+            UiColorSet colorSet = randomFragmentViewModel.getDefaultColorSet();
+            toolbarEntry.setBackgroundColor(colorSet.getBgColor());
+            titleEntry.setTextColor(colorSet.getTitleColor());
+            subtitleEntry.setTextColor(colorSet.getSubtitleColor());
         } else {
-            Log.e("LOADED CACHED", "LOADED CACHED");
+            Log.e("Nice", "Load next entry from cache");
             loadEntryImage(Objects.requireNonNull(randomFragmentViewModel.getCurrentEntry().getValue()).getGifURL());
         }
     }
 
     @Override
     public void fabPreviousClicked() {
-        if (!randomFragmentViewModel.switchToPreviousEntry()) {
-            Log.e("HIDE FAB", "AAAA");
+        if (!randomFragmentViewModel.switchToPreviousCachedEntry()) {
+            Log.e("Error", "No cached previous entries");
         } else {
-            Log.e("WTF FAB", "loaded from cache");
-
-            // cached gifs are shown without errors
-            randomFragmentViewModel.setError(new ErrorInfo(LoadError.NO_ERRORS));
+            Log.e("Nice", "Load previous entry from cache");
             loadEntryImage(Objects.requireNonNull(Objects.requireNonNull(randomFragmentViewModel.getCurrentEntry().getValue()).getGifURL()));
         }
     }

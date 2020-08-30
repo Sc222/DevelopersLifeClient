@@ -1,4 +1,4 @@
-package ru.sc222.devslife.utils;
+package ru.sc222.devslife.custom;
 
 public enum LoadError {
     NO_ERRORS,

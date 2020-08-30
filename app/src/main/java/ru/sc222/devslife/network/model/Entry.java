@@ -3,7 +3,7 @@ package ru.sc222.devslife.network.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import ru.sc222.devslife.utils.SimpleEntry;
+import ru.sc222.devslife.custom.SimpleEntry;
 
 public class Entry {
 

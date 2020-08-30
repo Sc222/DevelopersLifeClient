@@ -1,29 +1,39 @@
 package ru.sc222.devslife.viewmodel;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import java.util.Objects;
 
-import ru.sc222.devslife.utils.LoadError;
-import ru.sc222.devslife.utils.ErrorInfo;
-import ru.sc222.devslife.utils.SimpleEntry;
-import ru.sc222.devslife.utils.SimpleLinkedList;
-import ru.sc222.devslife.utils.SimpleNode;
+import ru.sc222.devslife.custom.ErrorInfo;
+import ru.sc222.devslife.custom.LoadError;
+import ru.sc222.devslife.custom.SimpleEntry;
+import ru.sc222.devslife.custom.SimpleLinkedList;
+import ru.sc222.devslife.custom.SimpleNode;
+import ru.sc222.devslife.custom.UiColorSet;
 
-public class RandomFragmentViewModel extends ViewModel {
+public class RandomFragmentViewModel extends AndroidViewModel {
 
-    private MutableLiveData<Boolean> isCurrentEntryImageLoaded=new MutableLiveData<>(false);
-    private MutableLiveData<Boolean> canLoadPrevious=new MutableLiveData<>(false);
+    private MutableLiveData<Boolean> isCurrentEntryImageLoaded = new MutableLiveData<>(false);
+    private MutableLiveData<Boolean> canLoadPrevious = new MutableLiveData<>(false);
     private MutableLiveData<Boolean> canLoadNext = new MutableLiveData<>(false);
-    private MutableLiveData<SimpleEntry> currentEntry=new MutableLiveData<>(null);
+    private MutableLiveData<SimpleEntry> currentEntry = new MutableLiveData<>(null);
     private MutableLiveData<ErrorInfo> error = new MutableLiveData<>(new ErrorInfo(LoadError.NO_ERRORS));
 
+    private final UiColorSet defaultColorSet;
+    
     //todo control linked list max size
-    private SimpleLinkedList<SimpleEntry> entries= new SimpleLinkedList<>();
-    private SimpleNode<SimpleEntry> currentEntryListNode=null;
+    private SimpleLinkedList<SimpleEntry> entries = new SimpleLinkedList<>();
+    private SimpleNode<SimpleEntry> currentEntryListNode = null;
 
+    public RandomFragmentViewModel(@NonNull Application application) {
+        super(application);
+        defaultColorSet = new UiColorSet(application.getApplicationContext());
+    }
 
     public MutableLiveData<ErrorInfo> getError() {
         return error;
@@ -45,12 +55,9 @@ public class RandomFragmentViewModel extends ViewModel {
         return canLoadPrevious;
     }
 
-    public void setCanLoadPrevious(boolean canLoadPrevious) {
-        this.canLoadPrevious.setValue(canLoadPrevious);
-    }
-
     public void updateCanLoadPrevious() {
-        this.canLoadPrevious.setValue(currentEntryListNode.getPrevious()!=null);
+        boolean hasNetworkErrors = Objects.requireNonNull(this.error.getValue()).hasNetworkErrors();
+        this.canLoadPrevious.setValue(!hasNetworkErrors && currentEntryListNode != null && currentEntryListNode.getPrevious() != null);
     }
 
     public MutableLiveData<Boolean> getCanLoadNext() {
@@ -59,6 +66,13 @@ public class RandomFragmentViewModel extends ViewModel {
 
     public void setCanLoadNext(boolean canLoadNext) {
         this.canLoadNext.setValue(canLoadNext);
+    }
+
+    public void setColorSet(UiColorSet colorSet) {
+        SimpleEntry entry = this.currentEntry.getValue();
+        assert entry != null;
+        entry.setColorSet(colorSet);
+        this.currentEntry.setValue(entry);
     }
 
     public LiveData<SimpleEntry> getCurrentEntry() {
@@ -72,7 +86,7 @@ public class RandomFragmentViewModel extends ViewModel {
         updateCanLoadPrevious();
     }
 
-    public boolean switchToNextEntry() {
+    public boolean switchToNextCachedEntry() {
         if (currentEntryListNode != null && currentEntryListNode.getNext() != null) {
             currentEntryListNode = currentEntryListNode.getNext();
             updateCanLoadPrevious();
@@ -82,7 +96,7 @@ public class RandomFragmentViewModel extends ViewModel {
         return false;
     }
 
-    public boolean switchToPreviousEntry() {
+    public boolean switchToPreviousCachedEntry() {
         if (currentEntryListNode != null && currentEntryListNode.getPrevious() != null) {
             currentEntryListNode = currentEntryListNode.getPrevious();
             updateCanLoadPrevious();
@@ -92,15 +106,13 @@ public class RandomFragmentViewModel extends ViewModel {
         return false;
     }
 
-    public void updateEntryColors(int defaultBgColor, int defaultTitleColor, int defaultSubtitleColor) {
-        SimpleEntry entry = getCurrentEntry().getValue();
-        assert entry != null;
-        entry.setColors(defaultBgColor,defaultTitleColor,defaultSubtitleColor);
-        currentEntry.setValue(entry);
-    }
 
     public void fixError(LoadError errorToBeFixed) {
-        if(Objects.requireNonNull(error.getValue()).getError()==errorToBeFixed)
+        if (Objects.requireNonNull(error.getValue()).getError() == errorToBeFixed)
             error.setValue(new ErrorInfo(LoadError.NO_ERRORS));
+    }
+
+    public UiColorSet getDefaultColorSet() {
+        return defaultColorSet;
     }
 }
