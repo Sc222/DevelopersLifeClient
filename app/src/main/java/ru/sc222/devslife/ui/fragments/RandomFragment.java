@@ -25,7 +25,6 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.IOException;
 import java.util.Objects;
 
 import retrofit2.Call;
@@ -74,13 +73,8 @@ public class RandomFragment extends ControllableFragment {
                     loadEntryImage(entry.buildSimpleEntry().getGifURL());
                 }
             } else {
-                try {
-                    assert response.errorBody() != null;
-                    randomFragmentViewModel.setError(new ErrorInfo(LoadError.CANT_LOAD_POST));
-                    Log.e("ERROR", "post onResponse: " + response.errorBody().string());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                randomFragmentViewModel.setError(new ErrorInfo(LoadError.CANT_LOAD_POST));
+                Log.e("ERROR", "post onResponse: ");
             }
         }
 
@@ -108,7 +102,18 @@ public class RandomFragment extends ControllableFragment {
         toolbarEntry = root.findViewById(R.id.entry_toolbar);
         titleEntry = root.findViewById(R.id.entry_title);
         subtitleEntry = root.findViewById(R.id.entry_subtitle);
+        ProgressBar loadProgress = root.findViewById(R.id.entry_progressbar);
+        FloatingActionButton fabPrevious = Objects.requireNonNull(getActivity()).findViewById(R.id.fab_previous);
+        FloatingActionButton fabNext = getActivity().findViewById(R.id.fab_next);
+        LinearLayoutCompat errorLayout = root.findViewById(R.id.error_layout);
+        AppCompatImageView errorIcon = root.findViewById(R.id.error_icon);
+        AppCompatTextView errorTitle = root.findViewById(R.id.error_title);
+        Button errorButton = root.findViewById(R.id.error_button);
+        setupObservers(loadProgress, fabPrevious, fabNext, errorLayout, errorIcon, errorTitle, errorButton);
+        return root;
+    }
 
+    private void setupObservers(ProgressBar loadProgress, FloatingActionButton fabPrevious, FloatingActionButton fabNext, LinearLayoutCompat errorLayout, AppCompatImageView errorIcon, AppCompatTextView errorTitle, Button errorButton) {
         randomFragmentViewModel.getCurrentEntry().observe(getViewLifecycleOwner(), entry -> {
             if (entry != null) {
                 Log.e("update curr", "update");
@@ -123,10 +128,6 @@ public class RandomFragment extends ControllableFragment {
                 subtitleEntry.setTextColor(colorSet.getSubtitleColor());
             }
         });
-
-        ProgressBar loadProgress = root.findViewById(R.id.entry_progressbar);
-        FloatingActionButton fabPrevious = Objects.requireNonNull(getActivity()).findViewById(R.id.fab_previous);
-        FloatingActionButton fabNext = getActivity().findViewById(R.id.fab_next);
         randomFragmentViewModel.getIsCurrentEntryImageLoaded().observe(getViewLifecycleOwner(),
                 isLoaded -> {
                     if (isLoaded)
@@ -147,10 +148,7 @@ public class RandomFragment extends ControllableFragment {
                 fabPrevious.setEnabled(enabled);
         });
 
-        LinearLayoutCompat errorLayout = root.findViewById(R.id.error_layout);
-        AppCompatImageView errorIcon = root.findViewById(R.id.error_icon);
-        AppCompatTextView errorTitle = root.findViewById(R.id.error_title);
-        Button errorButton = root.findViewById(R.id.error_button);
+
         randomFragmentViewModel.getError().observe(getViewLifecycleOwner(), errorInfo -> {
             randomFragmentViewModel.updateCanLoadPrevious();
             if (errorInfo.hasErrors()) {
@@ -190,7 +188,6 @@ public class RandomFragment extends ControllableFragment {
                 toolbarEntry.setVisibility(View.VISIBLE);
             }
         });
-        return root;
     }
 
     private void loadEntryImage(String url) {
@@ -228,27 +225,20 @@ public class RandomFragment extends ControllableFragment {
                 .into(imageViewEntry);
     }
 
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        Log.e("fragment RANDOM", "visibility: " + hidden);
-    }
 
     @Override
     public void fabNextClicked() {
-        titleEntry.setText("");
-        subtitleEntry.setText("");
         loadEntry();
     }
 
     private void loadRandomEntryFromSite() {
-        //load new entry if there are no cached
         APIInterface service = ServiceGenerator.getRetrofit().create(APIInterface.class);
         service.getRandomEntry().enqueue(entryCallback);
     }
 
-    private void setDefaultColors() {
-        //set default colors
+    private void setupEntryLayoutPlaceholders() {
+        titleEntry.setText("");
+        subtitleEntry.setText("");
         UiColorSet colorSet = randomFragmentViewModel.getDefaultColorSet();
         toolbarEntry.setBackgroundColor(colorSet.getBgColor());
         titleEntry.setTextColor(colorSet.getTitleColor());
@@ -256,16 +246,14 @@ public class RandomFragment extends ControllableFragment {
     }
 
     private void loadEntry() {
-        Glide.with(Objects.requireNonNull(getContext())).clear(imageViewEntry);
-
         if (!randomFragmentViewModel.switchToNextCachedEntry()) {
             randomFragmentViewModel.setCanLoadNext(false);
             Log.e("Error", "No cached previous entries");
-            Log.e("LOAD", "Loading from web");
+            Log.d("Load", "Loading from web");
+            setupEntryLayoutPlaceholders();
             loadRandomEntryFromSite();
-            setDefaultColors();
         } else {
-            Log.e("Nice", "Load next entry from cache");
+            Log.d("Nice", "Load next entry from cache");
             loadEntryImage(Objects.requireNonNull(randomFragmentViewModel.getCurrentEntry().getValue()).getGifURL());
         }
     }
@@ -275,7 +263,7 @@ public class RandomFragment extends ControllableFragment {
         if (!randomFragmentViewModel.switchToPreviousCachedEntry()) {
             Log.e("Error", "No cached previous entries");
         } else {
-            Log.e("Nice", "Load previous entry from cache");
+            Log.d("Nice", "Load previous entry from cache");
             loadEntryImage(Objects.requireNonNull(Objects.requireNonNull(randomFragmentViewModel.getCurrentEntry().getValue()).getGifURL()));
         }
     }

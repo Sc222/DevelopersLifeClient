@@ -29,9 +29,6 @@ public class NewsfeedFragmentViewModel extends ViewModel {
     private MutableLiveData<Boolean> canLoadPrevious = new MutableLiveData<>(false);
     private MutableLiveData<Boolean> canLoadNext = new MutableLiveData<>(false);
 
-    //todo create livedata for page
-
-
     private Callback<Entries> entriesCallback = new Callback<Entries>() {
         @Override
         public void onResponse(@NonNull Call<Entries> call, Response<Entries> response) {
@@ -39,19 +36,18 @@ public class NewsfeedFragmentViewModel extends ViewModel {
                 updateCanLoadNext();
                 Entries entries = response.body();
                 assert entries != null;
-                //randomFragmentViewModel.fixError(LoadError.CANT_LOAD_POST);
-                Log.e("Loaded", "entries page array size: " + entries.getEntries().size());
-                Log.e("Loaded", "entries total: " + entries.getTotalCount());
+                Log.d("Loaded", "entries page array size: " + entries.getEntries().size());
+                Log.d("Loaded", "entries total: " + entries.getTotalCount());
                 setEntries(entries);
             } else {
-                Log.e("ERROR", "page entries onResponse");
+                Log.e("Error", "page entries onResponse");
                 setError(PageLoadError.CANT_LOAD_PAGE);
             }
         }
 
         @Override
         public void onFailure(@NonNull Call<Entries> call, @NonNull Throwable t) {
-            Log.e("ERROR", "page entries onFailure: " + t.toString());
+            Log.e("Error", "page entries onFailure: " + t.toString());
             setError(PageLoadError.CANT_LOAD_PAGE);
         }
     };

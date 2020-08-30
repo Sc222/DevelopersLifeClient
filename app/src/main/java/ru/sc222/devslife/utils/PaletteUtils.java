@@ -15,13 +15,13 @@ public class PaletteUtils {
         Palette p = Palette.from(bitmap).generate();
         Palette.Swatch vibrantSwatch = p.getVibrantSwatch();
         if (vibrantSwatch != null) {
-            Log.e("PALETTE", "Generated successfully");
+            Log.d("Palette", "Generated successfully");
             int bgColor = ColorUtils.setAlphaComponent(vibrantSwatch.getRgb(), 204);
             int titleColor = vibrantSwatch.getTitleTextColor();
             int subTitleColor = vibrantSwatch.getBodyTextColor();
             result = new UiColorSet(bgColor, titleColor, subTitleColor);
         } else
-            Log.e("PALETTE", "Vibrant Swatch not available");
+            Log.e("Error", "Palette Vibrant Swatch not available");
         return result;
     }
 }

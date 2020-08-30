@@ -34,6 +34,7 @@ import ru.sc222.devslife.viewmodel.EntryViewModel;
 
 public class EntriesRecyclerAdapter extends RecyclerView.Adapter<EntriesRecyclerAdapter.EntryViewHolder> {
 
+    public static final int SPAN_COUNT = 2;
     Context context;
     List<SimpleEntry> entries;
     private String type;
