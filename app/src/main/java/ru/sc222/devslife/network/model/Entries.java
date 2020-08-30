@@ -8,21 +8,21 @@ import java.util.List;
 
 public class Entries {
 
-    public static final int PREFERRED_PAGE_SIZE = 6;
+    public static final int PREFERRED_PAGE_SIZE = 10;
     public static final String PREFERRED_TYPES = "gif";
 
     @SerializedName("result")
     @Expose
-    private List<Entries> entries = null;
+    private List<Entry> entries = null;
     @SerializedName("totalCount")
     @Expose
     private Integer totalCount;
 
-    public List<Entries> getEntries() {
+    public List<Entry> getEntries() {
         return entries;
     }
 
-    public void setEntries(List<Entries> entries) {
+    public void setEntries(List<Entry> entries) {
         this.entries = entries;
     }
 
